@@ -64,8 +64,10 @@ const FormTarea = () => {
         if(tareaseleccionada === null ){
             //tarea nueva
             //agregar la nueva rarea al state de tareas
-            tarea.proyectoId = proyectoActual.id;
-            tarea.estado = false;
+            tarea.proyecto = proyectoActual._id;
+            // en el modelo de tarea ya esta definido como false
+            //esto claro desde la api
+            //tarea.estado = false;
             agregarTarea(tarea);
         } else {
             //actualizar tarea existente

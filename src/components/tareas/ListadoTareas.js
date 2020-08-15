@@ -13,6 +13,8 @@ const ListadoTareas = () => {
     // obtener las tareas del proyecto
    const tareasContext = useContext(tareaContext);
    const { tareasproyecto } = tareasContext;
+
+   
     
     
     //si no hay proyecto seleccionado 
@@ -23,7 +25,7 @@ const ListadoTareas = () => {
     
     //elimina un proyecto    
     const onclickEliminar = () => {
-        eliminarProyecto(proyectoActual.id)
+        eliminarProyecto(proyectoActual._id)
     }
 
 

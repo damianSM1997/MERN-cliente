@@ -4,7 +4,9 @@ import { FORMULARIO_PROYECTO,
     AGREGAR_PROYECTO,
     VALIDAR_FORMULARIO,
     PROYECTO_ACTUAL,
-    ELIMINAR_PROYECTO
+    ELIMINAR_PROYECTO,
+    PROYECTO_ERROR
+    
     } from '../../types/index';
 
 export default (state , action ) => {
@@ -15,6 +17,7 @@ export default (state , action ) => {
             formulario: true
         }
         case OBTENER_PROYECTOS:
+            //console.log(action.payload)
             return {
                 ...state,
                 proyectos: action.payload
@@ -37,14 +40,20 @@ export default (state , action ) => {
             return {
                 ...state,
                 // por filter filtra xd por el id lo que se seleccionapor el payload
-                proyecto: state.proyectos.filter(proyecto => proyecto.id  === action.payload)
+                proyecto: state.proyectos.filter(proyecto => proyecto._id  === action.payload)
             } 
         case ELIMINAR_PROYECTO:
             return {
                 ...state,
-                proyectos: state.proyectos.filter(proyecto => proyecto.id  !== action.payload),
+                proyectos: state.proyectos.filter(proyecto => proyecto._id  !== action.payload),
                 proyecto: null
-            }    
+            }
+        case PROYECTO_ERROR:
+            return{
+                ...state,
+                mensaje: action.payload
+            }   
+        
         default:
             return state;
     }

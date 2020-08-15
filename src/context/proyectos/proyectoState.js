@@ -1,35 +1,40 @@
 import React , { useReducer } from 'react';
 
 //import uuid from 'uuid/dist/v4';
-import { v4 as uuidv4} from 'uuid';
+//import { v4 as uuidv4} from 'uuid';
 
 import proyectoContext from './proyectoContex';
 import proyectoReducer from './proyectoReducer';
 import { FORMULARIO_PROYECTO, 
         OBTENER_PROYECTOS,
         AGREGAR_PROYECTO,
+        PROYECTO_ERROR,
         VALIDAR_FORMULARIO,
         PROYECTO_ACTUAL,
         ELIMINAR_PROYECTO
+        
         } from '../../types/index';
 //import Proyecto from '../../components/proyectos/Proyecto';
-
+import clienteAxios from '../../config/axios';
 
 const ProyectoState = props => {
     
-    const proyectos = [
-        { id : 1, nombre: 'Tienda Virtual'},
-        { id : 2, nombre: 'Intranet'},
-        { id : 3, nombre: 'DIseño de sitio web'},
-        { id : 4, nombre: 'MEAR'}
-    ]
+    // const proyectos = [
+    //     { id : 1, nombre: 'Tienda Virtual'},
+    //     { id : 2, nombre: 'Intranet'},
+    //     { id : 3, nombre: 'DIseño de sitio web'},
+    //     { id : 4, nombre: 'MEAR'}
+    // ]
+
+
     
     const initialState = {
         
         proyectos : [],    
         formulario : false,
         errorformulario: false,
-        proyecto: null
+        proyecto: null,
+        mensaje: null,
     }
 
     //Dispatch para ejecutar las acciones
@@ -44,24 +49,55 @@ const ProyectoState = props => {
 
     //obtener lso proyectos
     //siempre lo que se obtenga de la funcion es el payload
-    const obtenerProyectos = () => {
+    const obtenerProyectos = async () => {
+        // nota es importante saber que se manda a los componentes
+        try {
+        const resultado = await clienteAxios.get('/api/proyectos');
         dispatch ({
             type: OBTENER_PROYECTOS,
-            payload: proyectos
+            payload: resultado.data.proyectos
         })
+    
+        } catch (error) {
+
+            const alerta = {
+                 msg: 'Hubo un error',
+                 categoria: 'alerta-error'
+             }
+             dispatch({
+                 type: PROYECTO_ERROR,
+                 payload: alerta
+             })            
+         }
     }
 
     //agregar nuevo proyecto
 
-    const agregarProyecto = proyecto => {
+    const agregarProyecto = async proyecto => {
         //proyecto.id = uuid.v4();
-        proyecto.id = uuidv4();
+        //proyecto.id = uuidv4();
+        
 
-        //agregamos el proyecto en el STATE
-        dispatch({
-            type: AGREGAR_PROYECTO,
-            payload: proyecto
-        })
+        try {
+            const resultado = await clienteAxios.post('/api/proyectos', proyecto)
+            console.log(resultado);
+            //agregamos el proyecto en el STATE
+            dispatch({
+                type: AGREGAR_PROYECTO,                
+                payload: resultado.data
+            })
+        } catch (error) {
+
+            const alerta = {
+                 msg: 'Hubo un error',
+                 categoria: 'alerta-error'
+             }
+
+             dispatch({
+                 type: PROYECTO_ERROR,
+                 payload: alerta
+             })            
+         }
     }
 
     //valida el formulario por errores
@@ -81,11 +117,28 @@ const ProyectoState = props => {
 
     // elimina n proyecto
 
-    const eliminarProyecto = proyectoId => {
-        dispatch({
-            type: ELIMINAR_PROYECTO,
-            payload: proyectoId
-        })
+    const eliminarProyecto = async proyectoId => {    
+            
+         try {
+            await clienteAxios.delete(`/api/proyectos/${proyectoId}`)
+            dispatch({
+                type: ELIMINAR_PROYECTO,
+                payload: proyectoId
+            })
+         } catch (error) {
+
+            const alerta = {
+                 msg: 'Hubo un error',
+                 categoria: 'alerta-error'
+             }
+
+             dispatch({
+                 type: PROYECTO_ERROR,
+                 payload: alerta
+             })
+
+            
+         }
     }
 
     return (
@@ -95,6 +148,7 @@ const ProyectoState = props => {
             formulario: state.formulario,
             errorformulario: state.errorformulario,
             proyecto: state.proyecto,
+            mensaje: state.mensaje,
             mostrarFormulario,
             obtenerProyectos,
             agregarProyecto,
